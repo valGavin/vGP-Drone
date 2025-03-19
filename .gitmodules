@@ -1,0 +1,6 @@
+[submodule "speedybee_control"]
+	path = speedybee_control
+	url = https://github.com/valGavin/speedybee_control
+[submodule "vgp_drone_controller"]
+	path = vgp_drone_controller
+	url = https://github.com/valGavin/vgp_drone_controller
