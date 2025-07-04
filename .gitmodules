@@ -4,3 +4,6 @@
 [submodule "vgp_drone_controller"]
 	path = vgp_drone_controller
 	url = https://github.com/valGavin/vgp_drone_controller
+[submodule "drone-camera"]
+	path = drone-camera
+	url = https://github.com/valGavin/drone-camera
