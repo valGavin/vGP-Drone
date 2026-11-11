@@ -7,14 +7,66 @@ are grouped by date (UTC). The format follows
 
 ## Unreleased
 
+Hardening round, 2026-11-11. **None of the code below has been built for its
+target or run on hardware** (B-25); only the firmware's host tests have run.
+
 ### Added
-- Project documentation in the root repository: `ARCHITECTURE.md`,
-  `BACKLOG.md`, `CHANGELOG.md`, `CLAUDE.md`, `DESIGN.md`, `OPERATIONS.md`,
-  `PRD.md`, `SECURITY.md`, `TESTING.md`.
+- **speedybee_control:** control-link timeout: iBUS output stops after 500 ms
+  without a valid control packet (B-01).
+- **speedybee_control:** control packets accepted only from the acknowledged
+  phone's address and only with plausible channel values (B-12, part).
+- **speedybee_control:** host unit tests for iBUS framing, packet decoding and
+  the link timeout; the logic moved to `ibus.h` and `control_link.h` (B-22,
+  part).
+- **vgp_drone_controller:** control packets sent every 20 ms from a timer
+  (B-08).
+- **vgp_drone_controller:** disarm on Quit, on leaving the foreground and on
+  closing the control screen (B-03).
+- **vgp_drone_controller:** `control_packet.dart` with a unit test, replacing
+  the Flutter template test (B-22, part).
 
 ### Changed
-- `README.md` rewritten with a system overview, repository layout and links to
-  the documents above.
+- **speedybee_control:** on any link loss the firmware goes silent and resets
+  its channels to disarmed defaults; it no longer sends a final frame with
+  AUX1 at the armed value (B-02).
+- **speedybee_control:** the phone is identified by the acknowledgement's
+  source address, not the address inside the message.
+- **speedybee_control:** iBUS command byte is the standard `0x40`, was `0x2C`
+  (B-13).
+- **speedybee_control:** per-frame hex dump is off unless `IBUS_DEBUG_PRINT`
+  is set (B-14).
+- **vgp_drone_controller:** disarming centres the sticks and returns throttle
+  to idle (B-09).
+- **vgp_drone_controller:** every discovery announcement is acknowledged, not
+  only the first.
+- **drone-camera:** the discovery broadcast repeats every second until
+  acknowledged (B-10).
+- **root:** submodule pointers moved to the hardening commits (B-16);
+  documentation updated to match.
+
+### Fixed
+- **speedybee_control:** buffer overflow in the acknowledgement handler
+  (B-04).
+- **speedybee_control:** channel state shared between the cores is guarded by
+  a critical section (B-07); lwIP calls from the main loop hold the lwIP lock
+  (B-20).
+- **vgp_drone_controller:** tapping the ARM row toggles arming (B-11).
+- **vgp_drone_controller:** the control screen can no longer be opened twice
+  when announcements keep arriving.
+- **drone-camera:** frames 400 px wide or less no longer leave the JPEG
+  buffer pointer unset (B-18, part).
+- **speedybee_control, vgp_drone_controller:** README corrections (B-17).
+
+## 2026-11-11
+
+### Added
+- **root:** project documentation: `ARCHITECTURE.md`, `BACKLOG.md`,
+  `CHANGELOG.md`, `CLAUDE.md`, `DESIGN.md`, `OPERATIONS.md`, `PRD.md`,
+  `SECURITY.md`, `TESTING.md`.
+
+### Changed
+- **root:** `README.md` rewritten with a system overview, repository layout
+  and links to the documents above.
 
 ## 2025-07-04
 

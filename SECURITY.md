@@ -13,13 +13,15 @@ or encryption above the WiFi layer.
 
 | ID | Issue | Impact | Backlog |
 |---|---|---|---|
-| SEC-1 | The Pico W accepts control packets from any source address | Any host on the hotspot can command or arm the drone with a 10-byte UDP datagram to port 9877 | B-12 |
-| SEC-2 | Stack buffer overflow in `receive_phone_acknowledgment`: `p->len` bytes are copied into a 32-byte buffer with no bound | A larger datagram sent to port 9877 before pairing corrupts memory on the receiver | B-04 |
-| SEC-3 | Discovery is unauthenticated | A host can answer the broadcast first, or spoof `DRONE` / `CAMERA` announcements so the app sends to the wrong address | B-12 |
+| SEC-1 | Control packets are authenticated only by source address | The Pico W drops packets that do not come from the acknowledged phone's address, but a host on the hotspot can forge that address | B-12 |
+| SEC-3 | Discovery is unauthenticated | A host can answer the Pico W's broadcast first and become the accepted phone, or spoof `DRONE` / `CAMERA` announcements so the app sends to the wrong address | B-12 |
 | SEC-4 | The camera stream is unauthenticated plain HTTP | Any host on the hotspot can watch the video | Not scheduled |
 | SEC-5 | The brightness command is unauthenticated | Any host on the hotspot can drive the flash LED | Not scheduled |
-| SEC-6 | No packet timeout | Not an attack by itself, but it turns any interruption of the app into a drone that keeps its last command | B-01 |
 | SEC-7 | Control packets carry no sequence number | Captured packets can be replayed | B-12 |
+
+Fixed in November 2026 (not yet verified on hardware, B-25): the stack buffer
+overflow in the acknowledgement handler (formerly SEC-2) and the missing
+packet timeout (formerly SEC-6).
 
 ## Credentials
 

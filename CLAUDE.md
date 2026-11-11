@@ -31,8 +31,8 @@ go to the submodule's own repository, then the pointer here is bumped.
 | `vgp_drone_controller/` | `valGavin/vgp_drone_controller` | Dart, Flutter |
 | `drone-camera/` | `valGavin/drone-camera` | Arduino, ESP32 core 3.1.3 |
 
-Default branch is `master` in all four. The pointers here are stale (B-16):
-run `git submodule update --remote` to see current code.
+Default branch is `master` in all four. After a change merges in a submodule,
+bump its pointer here in the same piece of work.
 
 ## Rules
 
@@ -78,6 +78,13 @@ cd vgp_drone_controller && flutter analyze && flutter test
 - Channel order AETR; AUX1 1200 is disarmed, 1500 is armed.
 - Throttle is incremental, not spring-centred.
 - On the Pico W, core 0 runs lwIP callbacks and core 1 sends iBUS.
-  `save_and_disable_interrupts` does not protect state shared between them.
-- There is no packet timeout yet (B-01). Treat every armed test as if the
-  drone may not stop.
+  State shared between them is guarded by `channels_lock`, a critical
+  section; interrupt masking alone does not exclude the other core.
+- The app sends the control packet every 20 ms. The firmware stops iBUS output
+  after 500 ms without a valid packet and relies on Betaflight's failsafe.
+  App and firmware must be updated together.
+- The hardening round of November 2026 has not run on hardware (B-25). Treat
+  every armed test as if the drone may not stop.
+- Firmware logic without hardware dependencies lives in `ibus.h` and
+  `control_link.h` and has host tests: `gcc -Wall -Wextra -I. test/test_host.c
+  -o test_host && ./test_host` in `speedybee_control`.

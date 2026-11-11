@@ -45,15 +45,16 @@ not a product for others to fly.
 
 ## Safety requirements
 
-These are what a flyable version needs. None is fully met today.
+These are what a flyable version needs. "Implemented" means the code exists
+but has not been built or run on hardware (B-25).
 
 | ID | Requirement | State |
 |---|---|---|
-| S-1 | If control packets stop for any reason, the drone disarms or enters Betaflight failsafe within 1 s **(threshold assumed)** | Not met (B-01) |
-| S-2 | Loss of WiFi results in a disarmed drone | Not met: failsafe frame keeps it armed (B-02) |
-| S-3 | Closing or backgrounding the app disarms the drone | Not met (B-03) |
-| S-4 | Malformed network input cannot crash or corrupt the receiver | Not met (B-04) |
-| S-5 | Only the paired phone can command the drone | Not met (B-12) |
+| S-1 | If control packets stop for any reason, the drone disarms or enters Betaflight failsafe within 1 s **(threshold assumed)** | Implemented, unverified: firmware stops iBUS after 500 ms; the outcome then depends on Betaflight's failsafe settings |
+| S-2 | Loss of WiFi results in a disarmed drone | Implemented, unverified: same mechanism as S-1 |
+| S-3 | Closing or backgrounding the app disarms the drone | Implemented, unverified: Quit and leaving the foreground send disarm; S-1 covers a crash |
+| S-4 | Malformed network input cannot crash or corrupt the receiver | Implemented; decoding is covered by host tests |
+| S-5 | Only the paired phone can command the drone | Partly: source-address check only (B-12) |
 
 ## Hardware
 
