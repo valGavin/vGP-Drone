@@ -19,8 +19,11 @@ are derived from the code and have not been re-run while writing this document.
 ```
 git clone --recurse-submodules https://github.com/valGavin/vGP-Drone
 cd vGP-Drone
-git submodule update --remote    # pointers in this repo are stale (B-16)
 ```
+
+Flash the Pico W and install the app from the same checkout. The firmware
+stops driving the flight controller when control packets pause, and only an
+app build with the fixed-rate sender sends them continuously.
 
 ## 2. Choose the hotspot credentials
 
@@ -50,7 +53,8 @@ tree (B-15).
 3. Hold BOOTSEL, plug in the Pico W, and copy `picow_speedybee.uf2` to the
    mounted drive.
 
-The `dhcpserver/` directory is not referenced by the build.
+The `dhcpserver/` directory is not referenced by the build. `ibus.h` and
+`control_link.h` are header-only and need no build changes.
 
 ## 4. Flash the camera
 
@@ -106,7 +110,7 @@ the flight controller were not recorded, so check each one.
 | Receiver | Serial (via UART), provider IBUS |
 | Receiver | Channel map AETR1234 |
 | Modes | ARM on AUX1 with a range that includes 1500 and excludes 1200 |
-| Failsafe | Stage 2 set to Drop |
+| Failsafe | Stage 2 set to Drop. **Required:** when the link is lost the Pico W goes silent and this setting decides what the drone does |
 | CLI | `get rx_min_usec`: the default is 885; the app sends throttle as low as 850 (B-05) |
 
 ## 8. Run
@@ -116,10 +120,10 @@ the flight controller were not recorded, so check each one.
 3. Open the app and dismiss the hotspot reminder.
 4. Wait for both the Drone and Camera tiles to show connected. The control
    screen opens one second later.
-5. Open the settings menu (gear, top left) and flip the ARM **switch**.
-   Tapping the row outside the switch does nothing (B-11).
+5. Open the settings menu (gear, top left) and tap ARM.
 6. Left stick: roll and pitch. Right stick: yaw, and up/down to nudge throttle.
-7. Disarm with the same switch before using Quit. Quit does not disarm (B-03).
+7. Disarm with the same control. Disarming returns throttle to idle. Quit and
+   leaving the app also disarm, but disarm first anyway.
 
 ### Status LEDs
 
@@ -136,18 +140,21 @@ the flight controller were not recorded, so check each one.
 
 | Symptom | Likely cause | Action |
 |---|---|---|
-| Camera tile never connects | The camera announces itself once; the app was not listening yet (B-10) | Open the app first, then reset the camera |
+| Camera tile never connects | Wrong hotspot credentials, or the camera cannot join | Watch the camera's serial output |
 | Drone tile never connects | Wrong hotspot credentials, or the Pico W cannot join | Watch the Pico W's USB serial output |
 | App stuck on the connection screen with one device found | The app needs both devices | Power the missing device |
 | No channel movement in Betaflight's Receiver tab | Wrong UART or provider, or TX/RX swapped | Recheck sections 6 and 7 |
 | Will not arm, or RX loss flag | Throttle below `rx_min_usec` (B-05) | Check Betaflight's arming-disable flags |
 | Motors climb to maximum and ignore the stick, props off | Expected PID behaviour without props; not yet confirmed as the cause here (B-06) | Follow [TESTING.md](TESTING.md), test T-4 |
-| Drone keeps running after the app closes | No packet timeout (B-01) | Disconnect the battery; fix B-01 before further armed tests |
+| Receiver tab shows RX loss until the control screen opens | Expected: the Pico W sends iBUS only while control packets arrive | Open the control screen |
+| RX loss whenever the sticks are idle | Old app build without the fixed-rate sender | Rebuild the app from the current code |
+| Drone keeps running after the app closes | Old firmware, or Betaflight failsafe not configured | Disconnect the battery; reflash and check section 7 |
 | Camera feed error | Stream dropped | Reload Camera in the settings menu |
 
 ## Emergency stop
 
-There is no reliable software stop today. On the bench, be ready to disconnect
-the battery. Turning the hotspot off stops the iBUS stream, which should
-trigger Betaflight's failsafe, but that depends on the flight controller's
-failsafe configuration and has not been tested.
+Do not rely on a software stop: none has been verified on hardware (B-25). On
+the bench, be ready to disconnect the battery. Disarming in the app, quitting
+it, or turning the hotspot off should each stop the motors, the last two
+through Betaflight's failsafe, which depends on the flight controller's
+failsafe configuration.

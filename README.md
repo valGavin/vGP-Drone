@@ -6,8 +6,9 @@ Pico W turns them into iBUS frames for a SpeedyBee F7 V3 flight controller
 running Betaflight. An ESP32-CAM streams video back to the app.
 
 > **Status: bench prototype, not flight-ready.** Control reaches the flight
-> controller, but there are open safety items (see [BACKLOG.md](BACKLOG.md),
-> P0) and an unresolved throttle issue. Do not arm with propellers fitted.
+> controller. The link-loss and input-handling fixes of November 2026 have not
+> yet been built or run on hardware (see [BACKLOG.md](BACKLOG.md), B-25), and
+> a throttle issue is unresolved. Do not arm with propellers fitted.
 
 ## How it fits together
 
@@ -36,8 +37,7 @@ Clone with submodules:
 git clone --recurse-submodules https://github.com/valGavin/vGP-Drone
 ```
 
-The submodule pointers in this repository are behind the submodules' own
-`master` branches (BACKLOG B-16). To work on the latest code:
+To move the submodules to the head of their own `master` branches:
 
 ```
 git submodule update --remote
